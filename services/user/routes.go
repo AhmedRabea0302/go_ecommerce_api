@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/AhmedRabea0302/ecom/config"
 	"github.com/AhmedRabea0302/ecom/services/auth"
 	"github.com/AhmedRabea0302/ecom/types"
 	"github.com/AhmedRabea0302/ecom/utils"
@@ -50,7 +51,15 @@ func (h *Handler) HandleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	utils.WrtieJSON(w, http.StatusOK, map[string]string{"token": "fgpifr3845rt3389u4365457%&$%5684"})
+	// Generate Token
+	secret := []byte(config.Envs.JWTSecret)
+	token, err := auth.CreateJWT(secret, u.ID)
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	utils.WrtieJSON(w, http.StatusOK, map[string]string{"token": token})
 }
 
 func (h *Handler) HandleRegister(w http.ResponseWriter, r *http.Request) {
