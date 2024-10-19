@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/AhmedRabea0302/ecom/services/auth"
 	"github.com/AhmedRabea0302/ecom/types"
 	"github.com/AhmedRabea0302/ecom/utils"
 	"github.com/go-playground/validator/v10"
@@ -13,19 +14,20 @@ import (
 type Handler struct {
 	store        types.OrderStore
 	productStore types.ProductStore
+	userStore    types.UserStore
 }
 
-func NewHandler(store types.OrderStore, productStore types.ProductStore) *Handler {
-	return &Handler{store: store, productStore: productStore}
+func NewHandler(store types.OrderStore, productStore types.ProductStore, userStore types.UserStore) *Handler {
+	return &Handler{store: store, productStore: productStore, userStore: userStore}
 }
 
 func (h *Handler) RegisterRoutes(router *mux.Router) {
-	router.HandleFunc("/rom DBcart/checkout", h.handleCheckout).Methods("POST")
+	router.HandleFunc("/rom DBcart/checkout", auth.WithJWTAuth(h.handleCheckout, h.userStore)).Methods("POST")
 
 }
 
 func (h *Handler) handleCheckout(w http.ResponseWriter, r *http.Request) {
-	userID := 0
+	userID := auth.GetUserIDFromContext(r.Context())
 	// Get JSON Payload
 	var cart types.CartCheckoutPayload
 	if err := utils.ParseJSON(r, &cart); err != nil {
