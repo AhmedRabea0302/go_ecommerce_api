@@ -28,3 +28,18 @@ type LoginPayload struct {
 	Email    string `json:"email" validate:"required,email"`
 	Password string `json:"password" validate:"required"`
 }
+
+type ProductStore interface {
+	GetProducts() ([]*Product, error)
+	CreateProduct(Product) error
+}
+
+type Product struct {
+	ID          int       `json:"id"`
+	Name        string    `json:"name" validate:"required,min=3"`
+	Description string    `json:"description" validate:"required"`
+	Image       string    `json:"image"`
+	Price       float64   `json:"price" validate:"required"`
+	Quantity    int       `json:"quantity" validate:"required"`
+	CreatedAt   time.Time `json:"created_at"`
+}
